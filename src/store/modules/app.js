@@ -92,6 +92,36 @@ const app = {
           reject(e)
         })
       })
+    },
+    setSettings ({ commit }, setting) {
+      return new Promise((resolve, reject) => {
+        const type = setting.type
+        const value = setting.value
+        switch (type) {
+          case 'theme':
+            commit(TOGGLE_NAV_THEME, value)
+            break
+          case 'primaryColor':
+            commit(TOGGLE_COLOR, value)
+            break
+          case 'layout':
+            commit(TOGGLE_LAYOUT, value)
+            break
+          case 'colorWeak':
+            commit(TOGGLE_WEAK, value)
+            break
+          case 'contentWidth':
+            commit(TOGGLE_CONTENT_WIDTH, value)
+            break
+          case 'fixedHeader':
+            commit(TOGGLE_FIXED_HEADER, value)
+            break
+          case 'fixSiderbar':
+            commit(TOGGLE_FIXED_SIDEBAR, value)
+            break
+        }
+        resolve()
+      })
     }
   }
 }

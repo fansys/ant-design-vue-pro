@@ -10,7 +10,12 @@ const getters = {
   roles: state => state.user.roles,
   userInfo: state => state.user.info,
   addRouters: state => state.permission.addRouters,
-  multiTab: state => state.app.multiTab
+  multiTab: state => state.app.multiTab,
+  fixedHeader: state => state.app.fixedHeader,
+  fixedSidebar: state => state.app.fixedSidebar,
+  weak: state => state.app.weak,
+  layout: state => state.app.layout,
+  contentWidth: state => state.app.contentWidth
 }
 
 export default getters

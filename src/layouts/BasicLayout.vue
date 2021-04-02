@@ -9,13 +9,6 @@
     :i18nRender="i18nRender"
     v-bind="settings"
   >
-    <!-- Ads begin
-      广告代码 真实项目中请移除
-      production remove this Ads
-    -->
-    <ads v-if="isProPreviewSite && !collapsed"/>
-    <!-- Ads end -->
-
     <!-- 1.0.0+ 版本 pro-layout 提供 API，
           我们推荐使用这种方式进行 LOGO 和 title 自定义
     -->
@@ -37,9 +30,6 @@
     </template>
 
     <setting-drawer :settings="settings" @change="handleSettingChange">
-      <div style="margin: 12px 0;">
-        This is SettingDrawer custom footer content.
-      </div>
     </setting-drawer>
     <template v-slot:rightContentRender>
       <right-content :top-menu="settings.layout === 'topmenu'" :is-mobile="isMobile" :theme="settings.theme" />
@@ -48,6 +38,7 @@
     <template v-slot:footerRender>
       <global-footer />
     </template>
+    <multi-tab v-if="multiTab"></multi-tab>
     <router-view />
   </pro-layout>
 </template>
@@ -61,7 +52,7 @@ import { CONTENT_WIDTH_TYPE, SIDEBAR_TYPE, TOGGLE_MOBILE_TYPE } from '@/store/mu
 import defaultSettings from '@/config/defaultSettings'
 import RightContent from '@/components/GlobalHeader/RightContent'
 import GlobalFooter from '@/components/GlobalFooter'
-import Ads from '@/components/Other/CarbonAds'
+import MultiTab from '@/components/MultiTab'
 import LogoSvg from '../assets/logo.svg?inline'
 
 export default {
@@ -71,14 +62,10 @@ export default {
     RightContent,
     GlobalFooter,
     LogoSvg,
-    Ads
+    MultiTab
   },
   data () {
     return {
-      // preview.pro.antdv.com only use.
-      isProPreviewSite: process.env.VUE_APP_PREVIEW === 'true' && process.env.NODE_ENV !== 'development',
-      // end
-
       // base
       menus: [],
       // 侧栏收起状态
@@ -86,19 +73,19 @@ export default {
       title: defaultSettings.title,
       settings: {
         // 布局类型
-        layout: defaultSettings.layout, // 'sidemenu', 'topmenu'
+        layout: this.$store.getters.layout, // 'sidemenu', 'topmenu'
         // CONTENT_WIDTH_TYPE
-        contentWidth: defaultSettings.layout === 'sidemenu' ? CONTENT_WIDTH_TYPE.Fluid : defaultSettings.contentWidth,
+        contentWidth: this.$store.getters.layout === 'sidemenu' ? CONTENT_WIDTH_TYPE.Fluid : this.$store.getters.contentWidth,
         // 主题 'dark' | 'light'
-        theme: defaultSettings.navTheme,
+        theme: this.$store.getters.theme,
         // 主色调
-        primaryColor: defaultSettings.primaryColor,
-        fixedHeader: defaultSettings.fixedHeader,
-        fixSiderbar: defaultSettings.fixSiderbar,
-        colorWeak: defaultSettings.colorWeak,
+        primaryColor: this.$store.getters.color,
+        fixedHeader: this.$store.getters.fixedHeader,
+        fixSiderbar: this.$store.getters.fixedSidebar,
+        colorWeak: this.$store.getters.weak,
 
-        hideHintAlert: false,
-        hideCopyButton: false
+        hideHintAlert: true,
+        hideCopyButton: true
       },
       // 媒体查询
       query: {},
@@ -110,7 +97,8 @@ export default {
   computed: {
     ...mapState({
       // 动态主路由
-      mainMenu: state => state.permission.addRouters
+      mainMenu: state => state.permission.addRouters,
+      multiTab: state => state.app.multiTab
     })
   },
   created () {
@@ -137,9 +125,9 @@ export default {
 
     // first update color
     // TIPS: THEME COLOR HANDLER!! PLEASE CHECK THAT!!
-    if (process.env.NODE_ENV !== 'production' || process.env.VUE_APP_PREVIEW === 'true') {
-      updateTheme(this.settings.primaryColor)
-    }
+    // if (process.env.NODE_ENV !== 'production' || process.env.VUE_APP_PREVIEW === 'true') {
+    updateTheme(this.settings.primaryColor)
+    // }
   },
   methods: {
     i18nRender,
@@ -175,6 +163,10 @@ export default {
           }
           break
       }
+      this.$store.dispatch('setSettings', {
+         'type': type,
+         'value': value
+      })
     }
   }
 }
